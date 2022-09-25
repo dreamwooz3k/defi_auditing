@@ -98,8 +98,8 @@ contract LendingTest is Test {
         }
         usdc.balanceOf(address(this));
     }
-} ```
-
+}
+```
 ## rkdnjs / DEX(2)
 ### 설명
 DEX.sol, removeLiquidity, 112/113, 119/120 번째 줄
