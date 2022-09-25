@@ -105,6 +105,7 @@ Low, information
 ## Eunyeong2 / lending / 무한 대출
 ### 설명
 Lending.sol / borrow
+
 borrow 함수는 대출자의 담보를 확인하고 담보의 50% 미만의 대출금을 빌려주는데, 대출을 하고나서 따로 이 사람이 대출을 했는지에 대한 검사를 하지 않아 한번 넣은 담보로 계속 대출을 할 수 있는 문제점이 발견되었다. 거래소의 존재하는 모든 usdc를 빼올 수 있다.
 ### 파급력
 dex의 모든 usdc를 빼낼 수 있기 때문에 Critical이다.
