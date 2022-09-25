@@ -98,7 +98,7 @@ contract LendingTest is Test {
         }
         usdc.balanceOf(address(this));
     }
-}```
+} ```
 
 ## rkdnjs / DEX(2)
 ### 설명
@@ -151,4 +151,4 @@ contract lending is Test {
         }
         USDOLLAR.balanceOf(address(this));
     }
-}```
+} ```
